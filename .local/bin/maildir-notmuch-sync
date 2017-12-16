@@ -412,8 +412,8 @@ case $TRIM_ACCOUNT_PREFIX_IN_TAGS in
 esac
 
 case $SLASHES_TO_DASHES in
-    true|TRUE|yes|YES|y|Y) echo "${1#$TRIMMER/}"                 ;;
-    *)                     echo "${1#$TRIMMER/}" | sed "s+/+-+g" ;;
+    true|TRUE|yes|YES|y|Y) echo "${1#$TRIMMER/}" | sed "s+/+-+g"  ;;
+    *)                     echo "${1#$TRIMMER/}"                  ;;
 esac
 
 }
@@ -483,10 +483,12 @@ Notmuch_State_To_Maildir__Move_To_Maildir ()
     local THIS_NOTMUCH_FOLDER="$(Notmuch_Folder_From_Full_Path $THIS_MAILDIR_FULL_PATH)"
     local THIS_NOTMUCH_TAG="$(Notmuch_Tag_From_Full_Path $THIS_MAILDIR_FULL_PATH)"
     local THIS_ACCOUNT_FOLDER="$(dirname $THIS_NOTMUCH_FOLDER)"
+
+    # removed path:"$THIS_ACCOUNT_FOLDER/**" from query below since i do not use
+    # a single notmuch root for my accounts.
     local THESE_MESSAGE_IDS_TO_COPY="$(\
         notmuch search --output=messages\
         tag:"$THIS_NOTMUCH_TAG" \
-        path:"$THIS_ACCOUNT_FOLDER/**"\
         NOT folder:"$THIS_NOTMUCH_FOLDER" \
         NOT folder:"$TRASH" \
         NOT tag:"$NEW_TAG")"
@@ -656,8 +658,10 @@ Maildir_State_To_Notmuch__Remove_Tags_From_Notmuch ()
     local THIS_NOTMUCH_FOLDER="$(Notmuch_Folder_From_Full_Path $THIS_MAILDIR_FULL_PATH)"
     local THIS_NOTMUCH_TAG="$(Notmuch_Tag_From_Full_Path $THIS_MAILDIR_FULL_PATH)"
     local THIS_ACCOUNT_FOLDER="$(dirname $THIS_NOTMUCH_FOLDER)"
+
+    # removed path:\"$THIS_ACCOUNT_FOLDER/**\ from query since I do not use a
+    # single notmuch root for my accounts
     local THIS_NOTMUCH_QUERY="tag:\"$THIS_NOTMUCH_TAG\"\
-                              path:\"$THIS_ACCOUNT_FOLDER/**\"\
                               NOT folder:\"$THIS_NOTMUCH_FOLDER\" \
                               NOT folder:\"$TRASH\""
     local THIS_COUNT="$(notmuch count $THIS_NOTMUCH_QUERY)"
